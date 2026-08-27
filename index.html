@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analisis de habitos</title>
+    <title>Mi Habit Tracker & Analytics</title>
     <style>
         :root {
             --bg-main: #f8fafc;
@@ -13,8 +13,7 @@
             --border: #e2e8f0;
             --primary: #6366f1;
             --primary-hover: #4f46e5;
-            --success: #0f172a; /* Cuadros rellenados oscuros estilo bullet journal */
-            --accent: #10b981;
+            --success: #0f172a; 
         }
 
         * {
@@ -76,6 +75,12 @@
             display: flex;
             gap: 12px;
             margin-bottom: 16px;
+        }
+
+        @media (max-width: 600px) {
+            .habit-form {
+                flex-direction: column;
+            }
         }
 
         input {
@@ -141,7 +146,7 @@
             border: 1px solid var(--border);
         }
 
-        /* Matriz de Habit Tracker */
+        /* Matriz de Habit Tracker Limpia y Horizontal */
         .tracker-container {
             overflow-x: auto;
             border-radius: 8px;
@@ -158,33 +163,27 @@
 
         .tracker-table th, .tracker-table td {
             border: 1px solid var(--border);
-            padding: 6px;
+            padding: 8px;
+            white-space: nowrap;
         }
 
         .tracker-table th {
             background-color: #f8fafc;
             color: var(--text-main);
             font-weight: 600;
-            writing-mode: vertical-lr;
-            transform: rotate(180deg);
-            height: 120px;
-            padding: 12px 4px;
-            vertical-align: middle;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
+            padding: 10px 12px;
         }
 
         .tracker-table th.day-col {
-            writing-mode: horizontal-tb;
-            transform: none;
-            height: auto;
-            width: 45px;
+            width: 60px;
             background-color: #f1f5f9;
         }
 
         .checkbox-cell {
             cursor: pointer;
-            width: 38px;
-            height: 38px;
+            width: 40px;
+            height: 40px;
             transition: background-color 0.15s, transform 0.1s;
         }
 
@@ -255,24 +254,27 @@
 
     <div class="container">
         <header>
-            <h1>Analisis de habitos</h1>
-            
+            <h1>✨ Mi Tracker & Analytics</h1>
+            <p>Diseño limpio, organizado y analíticas de progreso en tiempo real.</p>
         </header>
 
+        <!-- Configuración de Hábitos / Asignaturas -->
         <div class="card">
             <h2>🎯 Administrar Hábitos / Asignaturas</h2>
             <div class="habit-form">
-                <input type="text" id="habitInput" placeholder="Ej. Anatomía, Gimnasio, Farmacología, Lectura...">
+                <input type="text" id="habitInput" placeholder="Ej. Anatomía, Gimnasio, Inglés...">
                 <button onclick="addHabit()">Agregar</button>
             </div>
             <div class="habits-tags" id="habitsTagsContainer"></div>
         </div>
 
+        <!-- Matriz Principal -->
         <div class="card">
             <h2>📅 Matriz Mensual (31 Días)</h2>
             <div class="tracker-container" id="trackerTableWrapper"></div>
         </div>
 
+        <!-- Gráfica de Progreso por Asignatura / Hábito -->
         <div class="card">
             <h2>📈 Gráfica y Porcentaje de Progreso</h2>
             <div class="analytics-grid" id="analyticsContainer"></div>
@@ -285,11 +287,11 @@
         });
 
         function getHabits() {
-            return JSON.parse(localStorage.getItem("tracker_habits_v2")) || ["Anatomía", "Gimnasio", "Inglés"];
+            return JSON.parse(localStorage.getItem("tracker_habits_v3")) || ["Anatomía", "Gimnasio", "Inglés"];
         }
 
         function getRecords() {
-            return JSON.parse(localStorage.getItem("tracker_records_v2")) || {};
+            return JSON.parse(localStorage.getItem("tracker_records_v3")) || {};
         }
 
         function addHabit() {
@@ -304,7 +306,7 @@
             }
 
             habits.push(name);
-            localStorage.setItem("tracker_habits_v2", JSON.stringify(habits));
+            localStorage.setItem("tracker_habits_v3", JSON.stringify(habits));
             input.value = "";
             renderApp();
         }
@@ -312,7 +314,7 @@
         function deleteHabit(index) {
             let habits = getHabits();
             habits.splice(index, 1);
-            localStorage.setItem("tracker_habits_v2", JSON.stringify(habits));
+            localStorage.setItem("tracker_habits_v3", JSON.stringify(habits));
             renderApp();
         }
 
@@ -320,7 +322,7 @@
             let records = getRecords();
             const key = `${day}_${habit}`;
             records[key] = !records[key];
-            localStorage.setItem("tracker_records_v2", JSON.stringify(records));
+            localStorage.setItem("tracker_records_v3", JSON.stringify(records));
             renderApp();
         }
 
@@ -390,7 +392,6 @@
             }
 
             habits.forEach(habit => {
-                // Contar cuántos días de 31 se han marcado como cumplidos para este hábito
                 let completedCount = 0;
                 for(let day = 1; day <= 31; day++) {
                     if(records[`${day}_${habit}`]) {
@@ -398,7 +399,6 @@
                     }
                 }
 
-                // Calcular porcentaje basado en los 31 días del mes
                 const percentage = Math.round((completedCount / 31) * 100);
 
                 const statCard = document.createElement("div");
